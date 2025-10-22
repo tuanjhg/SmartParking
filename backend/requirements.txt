@@ -12,3 +12,14 @@ starlette==0.48.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.37.0
+
+# Additional dependencies for Smart Parking System
+pydantic-settings==2.8.2       # For configuration management
+python-multipart==0.0.18       # For file uploads
+opencv-python==4.11.0.84       # For image processing
+numpy==2.2.2                   # Required by opencv
+pillow==11.1.0                 # For image handling
+python-dotenv==1.0.1           # For .env file support
+
+# Firebase
+firebase-admin==6.5.0          # Firebase Admin SDK for Python
