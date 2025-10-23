@@ -110,26 +110,26 @@ def list_vehicles():
     }
 
 
-# @router.post("/checkout/{slot_id}")
-# def check_out_vehicle(slot_id: str):
-#     """
-#     API Check-out xe khỏi bãi
+@router.post("/checkout/{slot_id}")
+def check_out_vehicle(slot_id: str):
+    """
+    API Check-out xe khỏi bãi
     
-#     Args:
-#         slot_id: ID của slot cần giải phóng (vd: A3)
+    Args:
+        slot_id: ID của slot cần giải phóng (vd: A3)
         
-#     Returns:
-#         Thông báo kết quả
-#     """
-#     success = parking_service.release_slot(slot_id)
+    Returns:
+        Thông báo kết quả
+    """
+    success = parking_service.release_slot(slot_id)
     
-#     if success:
-#         return {
-#             "status": "ok",
-#             "message": f"Xe tại slot {slot_id} đã rời bãi"
-#         }
-#     else:
-#         raise HTTPException(
-#             status_code=404,
-#             detail=f"Không tìm thấy xe tại slot {slot_id}"
-#         )
+    if success:
+        return {
+            "status": "ok",
+            "message": f"Xe tại slot {slot_id} đã rời bãi"
+        }
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Không tìm thấy xe tại slot {slot_id}"
+        )

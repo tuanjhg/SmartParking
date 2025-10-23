@@ -3,28 +3,6 @@
 import { useState, useRef } from 'react';
 import { checkInVehicle } from '@/services/api';
 import { CheckInResponse } from '@/types';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Box,
-  Typography,
-  Alert,
-  AlertTitle,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Chip,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  CloudUpload as CloudUploadIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  DirectionsCar as DirectionsCarIcon,
-} from '@mui/icons-material';
 
 interface CheckInModalProps {
   isOpen: boolean;
