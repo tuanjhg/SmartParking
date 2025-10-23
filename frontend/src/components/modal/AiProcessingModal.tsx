@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { checkInVehicle } from '@/services/api';
 import type { VehicleInfo } from '@/types';
+import ProcessingStage from '../ai/ProcessingStage';
 
 interface AiProcessingModalProps {
   isOpen: boolean;
@@ -436,39 +437,6 @@ export default function AiProcessingModal({ isOpen, onClose, onSuccess, initialM
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-// Processing Stage Component
-interface ProcessingStageProps {
-  label: string;
-  status: 'pending' | 'processing' | 'complete';
-}
-
-function ProcessingStage({ label, status }: ProcessingStageProps) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-        status === 'complete' ? 'bg-green-600' :
-        status === 'processing' ? 'bg-blue-600 animate-pulse' :
-        'bg-gray-700'
-      }`}>
-        {status === 'complete' ? (
-          <CheckCircle className="w-4 h-4 text-white" />
-        ) : status === 'processing' ? (
-          <div className="w-3 h-3 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-        ) : (
-          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-        )}
-      </div>
-      <span className={`text-sm font-medium ${
-        status === 'complete' ? 'text-green-300' :
-        status === 'processing' ? 'text-blue-300' :
-        'text-gray-500'
-      }`}>
-        {label}
-      </span>
     </div>
   );
 }

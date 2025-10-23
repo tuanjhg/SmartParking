@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X, Map } from 'lucide-react';
-import ParkingMap from './ParkingMap';
+import ParkingMap from '../parking/ParkingMap';
 
 interface ParkingSlot {
   id: string;
