@@ -32,20 +32,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-ai-service/venv/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
