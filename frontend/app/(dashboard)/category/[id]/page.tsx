@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCategory, useExercises } from "@/hooks/useApi";
 
 const difficultyColors = {
@@ -10,6 +10,18 @@ const difficultyColors = {
   Medium: "bg-yellow-100 text-yellow-700",
   Hard: "bg-red-100 text-red-700",
 };
+
+// Lấy start và end từ URL
+function getStartEnd(url: string) {
+  const query = url.split("?")[1];
+  if (!query) return { start: 0, end: 99999 };
+
+  const params = new URLSearchParams(query);
+  const start = Number(params.get("start") || 0);
+  const end = Number(params.get("end") || 99999);
+
+  return { start, end };
+}
 
 export default function CategoryDetailPage({
   params,
@@ -21,6 +33,7 @@ export default function CategoryDetailPage({
     isLoading: categoryLoading,
     error: categoryError,
   } = useCategory(params.id);
+
   const {
     data: exercises,
     isLoading: exercisesLoading,
@@ -31,6 +44,74 @@ export default function CategoryDetailPage({
   const [selectedExerciseId, setSelectedExerciseId] = useState<number | null>(
     null
   );
+
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!selectedVideo) return;
+
+    const { start, end } = getStartEnd(selectedVideo);
+    let checkInterval: NodeJS.Timeout;
+
+    // Load YouTube API nếu chưa có
+    if (!(window as any).YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(tag);
+    }
+
+    // Đợi YT API load xong
+    const waitYT = setInterval(() => {
+      if ((window as any).YT && (window as any).YT.Player) {
+        clearInterval(waitYT);
+
+        playerRef.current = new (window as any).YT.Player(
+          "custom-video-player",
+          {
+            events: {
+              onReady: () => {
+                playerRef.current.seekTo(start);
+                playerRef.current.playVideo();
+              },
+              onStateChange: (event: any) => {
+                // Chỉ check khi đang phát
+                if (event.data === (window as any).YT.PlayerState.PLAYING) {
+                  checkInterval = setInterval(() => {
+                    if (!playerRef.current) {
+                      clearInterval(checkInterval);
+                      return;
+                    }
+
+                    const t = playerRef.current.getCurrentTime();
+
+                    // Nếu tua ra ngoài phạm vi thì kéo về
+                    if (t < start) {
+                      playerRef.current.seekTo(start);
+                    } else if (t > end) {
+                      // Chỉ khi thực sự vượt quá end mới dừng
+                      playerRef.current.pauseVideo();
+                      playerRef.current.seekTo(start);
+                      clearInterval(checkInterval);
+                    }
+                  }, 100);
+                } else {
+                  // Dừng check khi không phát
+                  if (checkInterval) clearInterval(checkInterval);
+                }
+              },
+            },
+          }
+        );
+      }
+    }, 300);
+
+    return () => {
+      clearInterval(waitYT);
+      if (checkInterval) clearInterval(checkInterval);
+    };
+  }, [selectedVideo]);
+
+  // ==========================================================================
 
   const isLoading = categoryLoading || exercisesLoading;
   const error = categoryError || exercisesError;
@@ -70,27 +151,37 @@ export default function CategoryDetailPage({
       {selectedVideo && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4 flex-col"
-          onClick={() => setSelectedVideo(null)}
+          onClick={() => {
+            setSelectedVideo(null);
+            playerRef.current = null;
+          }}
         >
           <div
             className="relative w-full max-w-4xl bg-white rounded-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={() => setSelectedVideo(null)}
+              onClick={() => {
+                setSelectedVideo(null);
+                playerRef.current = null;
+              }}
               className="absolute top-2 right-2 z-10 bg-black bg-opacity-50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-opacity-75 transition-colors"
             >
               ✕
             </button>
+
             <div className="relative pt-[56.25%]">
               <iframe
-                src={selectedVideo}
+                id="custom-video-player"
+                src={`${selectedVideo}&autoplay=1&controls=1&modestbranding=1&rel=0&enablejsapi=1&loop=1`}
                 className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
           </div>
+
+          {/* Nút tập luyện */}
           <Link
             href={`/practice/${params.id}/${selectedExerciseId}`}
             className="mt-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors"
@@ -99,7 +190,8 @@ export default function CategoryDetailPage({
           </Link>
         </div>
       )}
-      {/* Header with back button */}
+
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Link
           href="/category"
@@ -140,6 +232,7 @@ export default function CategoryDetailPage({
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">
           Danh sách bài tập ({exercises?.length || 0})
         </h2>
+
         {!exercises || exercises.length === 0 ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <p className="text-yellow-700">
@@ -213,7 +306,7 @@ export default function CategoryDetailPage({
         )}
       </div>
 
-      {/* Start All Button */}
+      {/* Start All */}
       <div className="flex justify-center pt-4">
         <Link
           href={`/practice/${params.id}`}
