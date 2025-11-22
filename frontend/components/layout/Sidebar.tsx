@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Dumbbell, BookOpen, User, MessageSquare } from "lucide-react";
+import {
+  LayoutDashboard,
+  Dumbbell,
+  BookOpen,
+  User,
+  MessageSquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -15,11 +21,6 @@ const navigation = [
     name: "Danh mục",
     href: "/category",
     icon: BookOpen,
-  },
-  {
-    name: "Tập luyện",
-    href: "/practice",
-    icon: Dumbbell,
   },
   {
     name: "Tư vấn AI",
